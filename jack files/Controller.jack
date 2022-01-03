@@ -1,0 +1,147 @@
+/** A Controller class */
+class Controller {
+
+    field int i, j; // the current index of the cursor (the cell cursor)
+    field Board board; // the minesweeper game board
+    field boolean lost; // true if the player lost (opened a mine cell)
+    field int level; // the current level
+
+    /** constructs a Controller */
+    constructor Controller new () {
+
+        // initialise the cursor index
+        let i = 0;
+        let j = 0;
+        let level = 1;
+
+        // creates a new board loaded with the first level.
+        let board = Board.new();
+        do Levels.load(board, 1);  
+        let lost = false;
+        
+        // print the initialised remaining flag (which is 10) 
+        do Output.moveCursor(4, 44);
+        do Output.printInt(10);
+
+        return this;
+    }
+
+    /** Draw the board */
+    method void drawBoard() {
+        do board.draw();
+        return;
+    }
+
+    /** 
+        Loads the given level to the board.
+
+        parameters:
+            i (int) - the level to load.
+    */
+    method void loadLevel(int i){
+        if ((i=1)|(i=2)|(i=3)|(i=4)|(i=5)) {
+            let level = i;
+            do board.dispose();
+            let board = Board.new();
+            do Levels.load(board, i);  
+            do Output.moveCursor(4, 58);
+            do Output.printInt(i);    
+
+            // resets the flags number left
+            do flagUnflag();
+            do flagUnflag(); 
+        }
+        return;
+    }
+
+    /** Draw in the board the current level number */
+    method void drawLevelNumber() {
+        do Output.moveCursor(4, 58);
+        do Output.printInt(level);   
+        return;        
+    }
+
+    /** Moves the cursor right */
+    method void moveRight() {
+        if (j < 8) {
+            do board.selectCell(i,j,false);
+            let j = j + 1;
+            do board.selectCell(i,j,true);
+        }
+        return;
+    }
+
+    /** Moves the cursor left */
+    method void moveLeft() {
+        if (j > 0) {
+            do board.selectCell(i,j,false);
+            let j = j - 1;
+            do board.selectCell(i,j,true);
+        }
+        return;
+    }
+
+    /** Moves the cursor up */
+    method void moveUp() {
+        if (i > 0) {
+            do board.selectCell(i,j,false);
+            let i = i - 1;
+            do board.selectCell(i,j,true);
+        }
+        return;
+    }
+
+    /** Moves the cursor down */
+    method void moveDown() {
+        if (i < 8) {
+            do board.selectCell(i,j,false);
+            let i = i + 1;
+            do board.selectCell(i,j,true);
+        }
+        return;
+    }
+
+    /** Opens the cell the cursor indicates to */
+    method void open() {
+        var Cell cell;
+        let cell = board.getCell(i,j);
+        do board.openCell(i, j);
+        if (cell.getValue() = 10) { let lost = true; }
+        return;
+    }
+
+    /** Flags and unflags the cell the cursor indicates to */
+    method void flagUnflag() {
+        var int flagesLeft;
+        do board.flagUnflagCell(i, j);
+        let flagesLeft = board.getFlagsLeft();
+        if (flagesLeft = 10) {
+            do Output.moveCursor(4, 44);
+            do Output.printInt(flagesLeft);      
+        } else {
+            do Output.moveCursor(4, 44);
+            do Output.printInt(0);   
+            do Output.moveCursor(4, 45);
+            do Output.printInt(flagesLeft);      
+        }
+        return;
+    }
+
+    // Called when the player has died */
+    method boolean hasDied() {
+        return lost;
+    }
+
+    // Called when the player has won */
+    method boolean hasWon() {
+        return ((board.getFlagsLeft() = 0) & board.foundAllMines());  
+    
+    }
+
+    /** Disposes the controller (and the it's board) */
+    method void dispose() {
+        do board.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
