@@ -1,0 +1,27 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux.hdl
+
+/**
+ * Demultiplexor:
+ * {a, b} = {in, 0} if sel == 0
+ *          {0, in} if sel == 1
+ */
+
+CHIP DMux {
+    IN in, sel;
+    OUT a, b;
+
+    PARTS:
+    // if sel == 1 we output in to b.
+    // beacuse if in == 1 then out is 1 and if in == 0 then out is 0.
+    And(a=in, b=sel, out=b);
+
+    // if sel == 1 then nsel = 0, else nsel = 1
+    Not(in=sel,out=nsel);
+
+    // if sel == 1 then nsel == 0 and we output in to a.
+    And(a=in, b=nsel, out=a);
+
+}

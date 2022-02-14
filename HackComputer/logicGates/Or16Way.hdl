@@ -1,0 +1,31 @@
+// This file is part of project05
+
+// File name: projects/05/Or16Way.hdl
+
+/**
+ * 16-way Or: 
+ * out = (in[0] or in[1] or ... or in[15])
+ */
+
+CHIP Or16Way {
+    IN in[16];
+    OUT out;
+
+    PARTS:
+    // Or gate with all neighbor pairs of bits.
+    Or(a=in[0], b=in[1], out=out01);
+    Or(a=out01, b=in[2], out=out12);
+    Or(a=out12, b=in[3], out=out23);
+    Or(a=out23, b=in[4], out=out34);
+    Or(a=out34, b=in[5], out=out45);
+    Or(a=out45, b=in[6], out=out56);
+    Or(a=out56, b=in[7], out=out67);
+    Or(a=out67, b=in[8], out=out78);
+    Or(a=out78, b=in[9], out=out89);
+    Or(a=out89, b=in[10], out=out910);
+    Or(a=out910, b=in[11], out=out1011);
+    Or(a=out1011, b=in[12], out=out1112);
+    Or(a=out1112, b=in[13], out=out1213);
+    Or(a=out1213, b=in[14], out=out1314);
+    Or(a=out1314, b=in[15], out=out);
+}

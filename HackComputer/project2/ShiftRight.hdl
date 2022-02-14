@@ -1,0 +1,31 @@
+// This file is part of nand2tetris, as taught in The Hebrew University,
+// and was written by Aviv Yaish, and is published under the Creative 
+// Common Attribution-NonCommercial-ShareAlike 3.0 Unported License 
+// https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+CHIP ShiftRight{
+	IN in[16];
+    OUT out[16];
+     
+    PARTS:
+    // we put the most left bit opposite in his right bit place and in his place.
+    Not(in=in[15], out=n15);
+    Not(in=n15, out=out[15]);
+	Not(in=n15, out=out[14]);
+
+    // all other bits are shifted right.
+    Or(a=in[14], b=false, out=out[13]);
+    Or(a=in[13], b=false, out=out[12]);
+    Or(a=in[12], b=false, out=out[11]);
+    Or(a=in[11], b=false, out=out[10]);
+    Or(a=in[10], b=false, out=out[9]);
+    Or(a=in[9], b=false, out=out[8]);
+    Or(a=in[8], b=false, out=out[7]);
+    Or(a=in[7], b=false, out=out[6]);
+    Or(a=in[6], b=false, out=out[5]);
+    Or(a=in[5], b=false, out=out[4]);
+    Or(a=in[4], b=false, out=out[3]);
+    Or(a=in[3], b=false, out=out[2]);
+    Or(a=in[2], b=false, out=out[1]);
+    Or(a=in[1], b=false, out=out[0]);
+}

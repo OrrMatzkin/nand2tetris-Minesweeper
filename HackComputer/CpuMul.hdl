@@ -1,0 +1,73 @@
+// This file is part of nand2tetris, as taught in The Hebrew University,
+// and was written by Aviv Yaish, and is published under the Creative 
+// Common Attribution-NonCommercial-ShareAlike 3.0 Unported License 
+// https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+// This chip is an extension of the regular CPU that uses the extended ALU.
+// If instruction[15]==0 or (instruction[14] and instruction[13] equals 1)
+// the CpuMul behave exactly as the same as the regular CPU.
+// If the instruction is a c-instruction and instruction[14] == 0, the chip will 
+// behave as follows:
+//  Instruction  | 12 | 11 | 10 |
+// ______________________________
+// dest=D<<;jump | 0  | 1  | 1  |
+// dest=A<<;jump | 0  | 1  | 0  |
+// dest=M<<;jump | 1  | 1  | 0  |
+// dest=D>>;jump | 0  | 0  | 1  |
+// dest=A>>;jump | 0  | 0  | 0  |
+// dest=M>>;jump | 1  | 0  | 0  |
+
+CHIP CpuMul {
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset=1) or continue executing
+                         // the current program (reset=0).
+    OUT outM[16],        // M value output
+        writeM,          // Write into M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+    
+    PARTS:
+    // choose between A-instruction and C-instruction
+    Mux16(a=instruction, b=ALU-output, sel=instruction[15], out=ARegister-input);
+
+    // A Register, if it's A-instuction or d1 is set then load=1, else load=0
+    Not(in=instruction[15], out=is-A-instruction);
+    Or(a=is-A-instruction, b=instruction[5], out=load-A);
+    ARegister(in=ARegister-input, load=load-A, out=ARegister-output, out[0..14]=addressM);
+
+    // choose between A Register output and M Register to be y input of the ALU
+    Mux16(a=ARegister-output, b=inM, sel=instruction[12], out=AM);
+
+    // D Register, if it's C-instuction or d2 is set then load=1, else load=0
+    And(a=instruction[4], b=instruction[15], out=load-D);
+    DRegister(in=ALU-output, load=load-D, out=DRegister-output);
+
+    // ALU, instruction[13..14] determines if the ALU will shift the output or act normal, and the other 6 bits are the ALU input pins
+    ExtendAlu(x=DRegister-output, y=AM, instruction=instruction[6..14], out=ALU-output, out=outM, zr=zr-output, ng=ng-output); 
+
+    // if instruction[3] == 1 then and we have a C-instruction then writeM = 1 else, writeM = 0
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    // if (ALU-output == 0) then zr = 1, else zr = 0.
+    // if (ALU-output < 0) then ng = 1, else ng = 0.
+    Not(in=zr-output, out=not-zr);
+    Not(in=ng-output, out=not-ng);
+    And(a=not-zr, b=not-ng, out=not-zr-ng);
+    
+    // check jump (j1, j2, j3)
+    And(a=instruction[2], b=ng-output, out=jump-neg);
+    And(a=instruction[1], b=zr-output, out=jump-zero);
+    And(a=instruction[0], b=not-zr-ng, out=jump-pos);
+
+    // checks if there a jump (of any kind)
+    Or(a=jump-neg, b=jump-zero, out=jump1);
+    Or(a=jump1, b=jump-pos, out=jump2);  
+
+    // if there is a jump and we have a C-instruction
+    And(a=jump2, b=instruction[15], out=load-pc);
+
+    // Program Counter
+    PC(in=ARegister-output, load=load-pc, inc=true, reset=reset, out[0..14]=pc);
+}
