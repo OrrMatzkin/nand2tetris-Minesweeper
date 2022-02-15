@@ -1,5 +1,4 @@
 # Assembler
-
 Before an assembly program can be executed on a computer, it must be translated into the computer’s binary machine language (our Hack language). The translation task is done by a program called the assembler. The assembler takes as input a stream of assembly commands and generates as output a stream of equivalent binary instructions. The resulting code can be loaded as is into the computer’s memory and executed by the hardware.
 
 The assembler is essentially a text-processing program, designed to provide translation services. For each symbolic command, the assembler carries out the following tasks (not necessarily in that order):
