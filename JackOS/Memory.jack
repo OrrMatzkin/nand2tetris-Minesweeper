@@ -1,0 +1,97 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+//  * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+
+    static array ram;
+    static Array heap;
+    static int freeList;
+
+    /** Initializes the class. */
+    function void init() {
+        let ram = 0;
+        let heap = 2048; // heapbase
+        let heap[1] = null; // next
+        let heap[0] = 14334; // length
+        let freeList = 0;
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let ram[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var int currSegment, block;
+        let currSegment = freeList;
+        if (size > 14336) {
+            return -1;
+        }
+        while (heap[currSegment] < size) {
+            // if we reached the the end of the freeList
+            if (heap[currSegment + 1] = null) {
+                    return -1;
+            }
+            let currSegment =  heap[currSegment + 1] - 2048;
+        }
+
+        let heap[currSegment] = heap[currSegment] - (size + 1);
+        let block = 2048 + currSegment + heap[currSegment] + 1;
+        do Memory.poke(block - 1, size + 1);
+
+        // if we gave the whole first block
+        if (block = freeList) {
+            let freeList = heap[freeList + 1];
+        }
+        return block;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        var int next;
+        if (o = -1) {
+            return;
+        }
+        let next = freeList + 1;
+        while (~(heap[next] = null)) {
+            let next = heap[next] + 1 - 2048;
+        }
+        let heap[next] = o - 1;
+        do Memory.poke(o, null);
+        return;
+    }    
+
+    /* If the parameter is an Array, the function returns the maximal element contained in the Array. 
+       If the parameter is an object, the function returns the maximal field of the object.  */
+    function int max(Array o) {
+        var int i, len, currMax;
+        let len = (Memory.peek(o-1) - 1);
+        let currMax = Memory.peek(o);
+        let i = 1;
+        while (i < len) {
+            if (currMax < Memory.peek(o + i)) {
+                let currMax = Memory.peek(o + i);
+            }
+            let  i = i + 1;
+        }
+        return currMax;
+    }
+
+}
