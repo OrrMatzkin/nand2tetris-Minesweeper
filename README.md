@@ -1,6 +1,6 @@
 # nand2tetris-Minesweeper
 
-As part of The Hebrew University of Jerusalem course *"Nand to Tetris"* I built a general-purpose computer system and a modern software hierarchy from the ground up. After the copmuter was ready I designed and develpoed a mini version of the known Minesweeper game to run on the computer system.
+As part of The Hebrew University of Jerusalem course "Nand to Tetris" I built a general-purpose computer system and a modern software hierarchy from the ground up. After the computer was ready I designed and developed a mini version of the known Minesweeper game to run on the computer system.
 
 Minesweeper is a single-player puzzle video game. The objective of the game is to clear a rectangular board containing hidden "mines" without detonating any of them, with help from clues about the number of neighbouring mines in each field. The game originates from the 1960s, and it has been written for many computing platforms in use today.
 For more information about the game see https://en.wikipedia.org/wiki/Minesweeper_(video_game)
